@@ -27,7 +27,7 @@ class Salida(Agent):
 
 # Modelo del juego
 class GameModel(Model):
-    def __init__(self, width, height, num_globos, algoritmo_busqueda):
+    def __init__(self, width, height, num_globos, modo_busqueda,modo_aleatorio):
         super().__init__()
 
         # Se crea la grilla y el schedule
@@ -47,12 +47,18 @@ class GameModel(Model):
         self.camino_busqueda=self.busqueda_anchura(self.inicio, self.salida)
         self.caminos=self.get_path(self.inicio, self.salida)
 
+        print("------Se inicia con busqueda")
+        print(modo_busqueda)
+
+        print("----Se inicia en el modo aleatorio")
+        print(modo_aleatorio)
+
       
         
 
         
         # Se crea el agente Bomberman con la posicion de inicio
-        self.personaje = BombermanAgent(1, self, algoritmo_busqueda)
+        self.personaje = BombermanAgent(1, self)
         self.grid.place_agent(self.personaje, self.inicio)
         self.schedule.add(self.personaje)
 
@@ -60,6 +66,7 @@ class GameModel(Model):
         self.bomberman_mueve = False
         self.muestra_camino = False
         self.nivel_maximo = 0
+        self.state = "Estado Inicial"
 
 
 
@@ -136,7 +143,6 @@ class GameModel(Model):
 
             self.caminos = posiciones_camino
 
-            print("Salida-: ", self.salida)
 
 
         
@@ -180,7 +186,7 @@ class GameModel(Model):
                             if next_level not in level_dict:
                                 level_dict[next_level] = []
                             level_dict[next_level].append(neighbor)
-                            print(level_dict)
+                            #print(level_dict)
                             return level_dict
 
                         elif type(cell[0]) is Camino :
@@ -193,7 +199,7 @@ class GameModel(Model):
                         #Si el vecino es la salida, se agrega al diccionario de visitados y se rompe el ciclo
 
         
-        print("No existe camino")
+        #print("No existe camino")
         print(level_dict)
         return {}
     
@@ -215,15 +221,15 @@ class GameModel(Model):
         path.append(end)
         current = end
         level = level_dict[max(level_dict.keys())]
-        print(level)
+        #print(level)
         for i in range(max(level_dict.keys()), 0, -1):
             for neighbor in self.grid.get_neighborhood(current, moore=False, include_center=False):
                 if neighbor in level_dict[i-1]:
                     path.append(neighbor)
                     current = neighbor
                     break
-        print("Camino")
-        print(path)
+        #print("Camino")
+        #print(path)
         return path
      
 

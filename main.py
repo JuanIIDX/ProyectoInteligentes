@@ -5,15 +5,25 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 import random
 from queue import PriorityQueue
+import mesa
 
 from GameModel import GameModel
 from BombermanAgent import BombermanAgent
 from GloboAgent import GloboAgent
 from GameModel import Roca, Camino, Metal, Salida
 
-WIDTH = 10
-HEIGHT = 10
+WIDTH = 30
+HEIGHT = 30
 
+simulation_parameters = {
+    "modo_busqueda": mesa.visualization.Slider(name="1-Anchura 2-Profundidad 3-Ay", value=0,min_value=0, max_value=2, step=1, description="Modo de busqueda"),
+    "modo_aleatorio": mesa.visualization.Slider(name="0-Aleatorio 1-No", value=0,min_value=0, max_value=1, step=1, description="Modo aleatorio"),
+"width": WIDTH,
+"height": HEIGHT,
+"num_globos": 0
+                            
+    
+}
 
 # Función para representar gráficamente el entorno con circulos dentro del CanvasGrid
 #AGREGAR LUEGO EL GLOBO
@@ -101,15 +111,6 @@ def dibujo_salida(agent):
 
 
 
-        
-
-        
-
-        
-    
-        
-    
-    
 
 
 
@@ -119,9 +120,8 @@ def lanzar_simulacion(algoritmo_busqueda):
 
 
     grid = CanvasGrid(bomberman_visualization, WIDTH, HEIGHT, 1000, 1000)
-    server = ModularServer(GameModel, [grid], "Bomberman", 
-                           {"width": WIDTH, "height": HEIGHT, "num_globos": 0, 
-                            "algoritmo_busqueda": algoritmo_busqueda})
+    server = ModularServer(model_cls=GameModel, visualization_elements=[grid], name="Bomberman", model_params=simulation_parameters
+                           )
     server.port = 8521  # El puerto donde se verá en el navegador
     server.launch()
 

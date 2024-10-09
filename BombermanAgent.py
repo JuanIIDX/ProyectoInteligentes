@@ -8,10 +8,9 @@ from queue import PriorityQueue
 
 
 class BombermanAgent(Agent):
-    def __init__(self, unique_id, model, pos):
+    def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.movimientos = []
-        self.pos = pos
         self.power = 1  # Poder inicial de destrucción
         self.mov=False
         self.pos_vec=0
