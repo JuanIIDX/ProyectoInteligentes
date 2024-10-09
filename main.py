@@ -16,33 +16,46 @@ WIDTH = 30
 HEIGHT = 30
 
 simulation_parameters = {
-    "modo_busqueda": mesa.visualization.Slider(name="1-Anchura 2-Profundidad 3-Ay", value=0,min_value=0, max_value=2, step=1, description="Modo de busqueda"),
-    "modo_aleatorio": mesa.visualization.Slider(name="0-Aleatorio 1-No", value=0,min_value=0, max_value=1, step=1, description="Modo aleatorio"),
+    "modo_busqueda": mesa.visualization.Slider(name="1-Anchura 2-Profundidad 3-Busqueda Uniforme", value=0,min_value=0, max_value=2, step=1, description="Modo de busqueda"),
+    "modo_aleatorio": mesa.visualization.Slider(name="0-Aleatorio 1-Carga Archivo", value=0,min_value=0, max_value=1, step=1, description="Modo aleatorio de creacion de mundo"),
 "width": WIDTH,
 "height": HEIGHT,
-"num_globos": 0
+"num_globos": 0,
+"numero_rocas": mesa.visualization.Slider(name="Probabilidad de roca", value=10, min_value=1, max_value=200, step=1, description="Probabilidad de rocas en modo aleatorio"),
                             
     
 }
 
-# Función para representar gráficamente el entorno con circulos dentro del CanvasGrid
-#AGREGAR LUEGO EL GLOBO
-def agent_portrayal(agent):
-    """ Dibuja los agentes y el laberinto. """
-    if isinstance(agent, BombermanAgent):
-        return {"Shape": "circle", "Filled": "true", "Color": "blue", "Layer": 0, "r": 0.8}
-    else:
-        #Se obtiene el tipo de objeto del agente para dibujarlo en la matriz, si es roca, camino, metal o salida
-        if isinstance(agent, Roca):
-            return {"Shape": "rect", "Filled": "true", "Color": "black", "Layer": 0, "w": 1, "h": 1}
-        elif isinstance(agent, Camino):
-            return {"Shape": "rect", "Filled": "true", "Color": "white", "Layer": 0, "w": 1, "h": 1}
-        elif isinstance(agent, Metal):
-            return {"Shape": "rect", "Filled": "true", "Color": "gray", "Layer": 0, "w": 1, "h": 1}
-        elif isinstance(agent, Salida):
-            return {"Shape": "rect", "Filled": "true", "Color": "green", "Layer": 0, "w": 1, "h": 1}
+
+    
+def dibuja_bomberman(agent):
+   
+    #Se consigue la direccion del agente
+
+    direction=agent.model.personaje.direction
+
+    if direction == 2:
+        return {"Shape": "images/S.png",  "Layer": 0, "w": 1, "h": 1}
+    elif direction == 4:
+        return {"Shape": "images/W.png",  "Layer": 0, "w": 1, "h": 1}
+    elif direction == 6:
+        return {"Shape": "images/E.png",  "Layer": 0, "w": 1, "h": 1}
+    elif direction == 8:
+        return {"Shape": "images/N.png",  "Layer": 0, "w": 1, "h": 1}
+    elif direction == 5:
+        #Se obtiene el numero del step en el modelo y se imprime
+
+        #El numero del step actual es
         
-        return None
+
+
+        animacion=agent.model.schedule.steps%2
+        if animacion==0:
+            return {"Shape": "images/V_B.png",  "Layer": 0, "w": 1, "h": 1}
+        else:
+            return {"Shape": "images/V_A.png",  "Layer": 0, "w": 1, "h": 1}
+
+    
 
 
 
@@ -53,7 +66,7 @@ def bomberman_visualization(agent):
     else:
         # Si el agente es un bomberman, se dibuja con un circulo azul
         if isinstance(agent, BombermanAgent):
-            portrayal = {"Shape": "circle", "Filled": "true", "Color": "blue", "Layer": 0, "r": 0.8}
+            portrayal = dibuja_bomberman(agent)
         # Si el agente es un globo, se dibuja con un circulo rojo
         elif isinstance(agent, GloboAgent):
             portrayal = {"Shape": "circle", "Filled": "true", "Color": "red", "Layer": 0, "r": 0.8}
@@ -92,14 +105,14 @@ def dibujo_camino(agent):
         
         #Si el bomberman se mueve, se muestran los caminos que se pueden recorrer
         else:
-            camino_bomberman=agent.model.caminos
+            camino_bomberman=agent.model.personaje.movimientos
 
             if camino_bomberman is []:
                 return {"Shape": "rect", "Filled": "true", "Color": "Red", "Layer": 0, "w": 1, "h": 1}
 
-            for camino in camino_bomberman:
-                if agent.pos == camino:
-                    return {"Shape": "rect", "Filled": "true", "Color": "purple", "Layer": 0, "w": 1, "h": 1}
+            for pos in range(len(camino_bomberman)):
+                if agent.pos == camino_bomberman[pos]:
+                    return {"Shape": "rect", "Filled": "true", "Color": "purple", "Layer": 0, "w": 1, "h": 1,"text":str(pos),"text_color": "black"}
                 
             return {"Shape": "rect", "Filled": "true", "Color": "white", "Layer": 0, "w": 1, "h": 1}
 
