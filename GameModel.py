@@ -7,6 +7,10 @@ import random
 from queue import PriorityQueue
 from BombermanAgent import BombermanAgent
 from collections import deque
+import os
+
+class MapaError(Exception):
+    pass
 
 class Roca(Agent):
     def __init__(self, unique_id, model):
@@ -54,7 +58,7 @@ class GameModel(Model):
         #Si el modo de carga es 1, entonces se crea el mundo a partir de un archivo
         else:
             print('Se activo la carga por un archivo')
-            self.crea_mundo_aleatorio()      
+            self.leer_mapa('archivo.txt') 
         
 
 
@@ -99,6 +103,8 @@ class GameModel(Model):
 
         print("Inicio: ", self.inicio)
         print("Salida: ", self.salida)
+
+        self.imprime_mundo_en_matriz()
        
 
         # Añadir globos (enemigos) en posiciones aleatorias
@@ -184,13 +190,60 @@ class GameModel(Model):
         crea_paredes_internas_y_caminos(self)
         coloca_salida(self)
 
+    def leer_mapa(self,ruta_relativa):
+        try:
+            # Obtener la ruta absoluta del archivo
+            ruta_absoluta = os.path.join(os.getcwd(), ruta_relativa)
+            
+            # Verifica si el archivo existe
+            if not os.path.isfile(ruta_absoluta):
+                raise FileNotFoundError(f"El archivo '{ruta_relativa}' no se encontró en el proyecto.")
+            
+            with open(ruta_absoluta, 'r') as f:
+                posiciones_camino = []
+                # Lee el archivo y guarda cada línea en una lista
+                for y, line in enumerate(f):
+                    for x, char in enumerate(line.strip()):
+                        print(f"({x}, {y}): {char}")
+
+                        if char == 'R':
+                            roca = Roca(self.next_id(), self)
+                            self.grid.place_agent(roca, (x, y))
+                        elif char == 'C':
+                            camino = Camino(self.next_id(), self)
+                            self.grid.place_agent(camino, (x, y))
+                            posiciones_camino.append((x, y))
+                        elif char == 'M':
+                            metal = Metal(self.next_id(), self)
+                            self.grid.place_agent(metal, (x, y))
+                        elif char == 'E':
+                            salida = Salida(self.next_id(), self)
+                            self.grid.place_agent(salida, (x, y))
+                            self.salida = (x, y)
+                        elif char == 'P':
+                            self.inicio = (x, y)
+                        else:
+                            raise MapaError(f"Carácter no válido en la posición ({x}, {y}): '{char}'")
+                        
+
+
+                self.caminos = posiciones_camino
+                
+
+            
+
+
+        except FileNotFoundError as e:
+            print(e)
+        except MapaError as e:
+            print(f"Error en el mapa: {e}")
+        except Exception as e:
+            print(f"Error inesperado: {e}")
+
 
     
 
-    def crea_mundo_carga(self, archivo):
-        """Crea el mundo a partir de un archivo"""
-        pass
-
+ 
 
     """★★★★★★★★★★★★★★★★★★★★Metodos de busqueda★★★★★★★★★★★★★★★★★★★★★★★★★★★★★"""
 
@@ -515,6 +568,8 @@ class GameModel(Model):
             print()
 
 
+
+
     def get_dicc_path(self):
         #Si bomberman ya se puede mover, entonces devuelve un diccionario vacio
         if self.bomberman_mueve is True:
@@ -559,10 +614,6 @@ class GameModel(Model):
         
     def get_exit_position(self):
         return self.salida
+    
 
-
-
-
-
-
-
+    
