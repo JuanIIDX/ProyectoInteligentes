@@ -76,6 +76,8 @@ def bomberman_visualization(agent):
         return {"Shape": "rect", "Filled": "true", "Color": "gray", "Layer": 0, "w": 1, "h": 1}
     elif isinstance(agent, Salida):
         return dibujo_salida(agent)
+    elif isinstance(agent, GloboAgent):
+        return {"Shape": "circle", "Filled": "true", "Color": "red", "Layer": 0, "r": 0.8}
 
 
 #Cambiar luego

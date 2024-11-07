@@ -5,9 +5,10 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 import random
 from queue import PriorityQueue
-from BombermanAgent import BombermanAgent, CustomAgent
+from BombermanAgent import BombermanAgent
 from collections import deque
 import os
+from GloboAgent import GloboAgent
 from clases import Roca, Camino, Metal, Salida
 from busquedas import Busquedas
 
@@ -168,6 +169,13 @@ class GameModel(Model):
             #Coloca una roca en la salida
             roca = Roca(self.next_id(), self)
             self.grid.place_agent(roca, pos)
+
+            for i in range(3):
+                globo = GloboAgent(self.next_id(), self)
+                globo_pos = (4,5)
+                self.grid.place_agent(globo, globo_pos)
+                self.schedule.add(globo)
+
 
 
 

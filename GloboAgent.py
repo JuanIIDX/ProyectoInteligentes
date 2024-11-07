@@ -6,14 +6,11 @@ from mesa.visualization.ModularVisualization import ModularServer
 import random
 from queue import PriorityQueue
 
-# Definir el agente enemigo (Globo)
+from clases import Camino
+
 class GloboAgent(Agent):
-# Agente Bomberman
-    def __init__(self, unique_id, model, pos_ini):
+    def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.camino_recorrido = []  # Guardar el camino recorrido
-        self.posicion_actual = (0, 0)  # Posición inicial
-        
+
     def step(self):
-        print("Se movio un paso adelante")
-        pass
+        print("Globo step")
