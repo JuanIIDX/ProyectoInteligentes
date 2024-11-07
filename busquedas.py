@@ -87,7 +87,7 @@ class Busquedas():
 
         
 
-    """★Busqueda en profundidad básica con prioridad fija★"""
+    """★ Búsqueda en profundidad básica con prioridad fija ★"""
     def busqueda_profundidad(self, start, end, grid):
         stack = deque()
         visited = set()
@@ -104,8 +104,8 @@ class Busquedas():
             current, step = stack.pop()
             next_step = step + 1
 
-            # Explorar en el orden de prioridad
-            for dx, dy in priority_directions:
+            # Agregar en el orden inverso para que se procesen correctamente en el orden de prioridad
+            for dx, dy in reversed(priority_directions):
                 neighbor = (current[0] + dx, current[1] + dy)
 
                 # Verificar que el vecino esté dentro de los límites de la cuadrícula y no haya sido visitado
@@ -113,7 +113,7 @@ class Busquedas():
                     cell = grid.get_cell_list_contents(neighbor)
                     if cell:
                         # Si encontramos la salida, añadimos y terminamos
-                        if type(cell[0]) is Salida:
+                        if isinstance(cell[0], Salida):
                             visited.add(neighbor)
                             if next_step not in step_dict:
                                 step_dict[next_step] = []
@@ -121,7 +121,7 @@ class Busquedas():
                             return step_dict
 
                         # Si encontramos un camino, avanzamos en esa dirección
-                        elif type(cell[0]) is Camino:
+                        elif isinstance(cell[0], Camino):
                             visited.add(neighbor)
                             stack.append((neighbor, next_step))
                             if next_step not in step_dict:
@@ -130,7 +130,7 @@ class Busquedas():
 
         return {}
 
-    """★Camino★"""
+    """★ Camino ★"""
     def obtiene_camino_profundidad(self, start, end, grid):
         step_dict = self.busqueda_profundidad(start, end, grid)
 
@@ -419,7 +419,7 @@ class Busquedas():
                 if 0 <= neighbor[0] < grid.width and 0 <= neighbor[1] < grid.height:
                     cell = grid.get_cell_list_contents(neighbor)
                     if cell:
-                        # Calcular g(n) para el vecino
+                        # Calcular g(n) para el vecino: costo acumulado hasta el vecino
                         new_g = visited[current] + 1  # Asumiendo que cada movimiento tiene un costo de 1
                         
                         # Calcular h(n) usando la distancia Manhattan al objetivo
@@ -444,7 +444,7 @@ class Busquedas():
                                 step_dict[next_step] = []
                             step_dict[next_step].append(neighbor)
 
-        return {}
+        return step_dict
 
     """★ Camino ★"""
     def obtiene_camino_a_estrella(self, start, end, grid):

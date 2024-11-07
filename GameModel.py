@@ -12,6 +12,9 @@ from GloboAgent import GloboAgent
 from clases import Roca, Camino, Metal, Salida
 from busquedas import Busquedas
 
+class MapaError(Exception):
+    pass
+
 
 
 # Modelo del juego
@@ -22,6 +25,9 @@ class GameModel(Model):
         # Se crea la grilla y el schedule
         self.grid = MultiGrid(width, height, True) #Se crear una grilla de tamaño width x height(Poner aleatorio luego)
         self.schedule = SimultaneousActivation(self) #Se crea un schedule para los agentes
+
+        self.height = height
+        self.width = width
         
         # Se crear una posicion de salida que no este en un x,y par ni en las paredes
         self.inicio= (0,0)
@@ -49,11 +55,11 @@ class GameModel(Model):
         self.personaje.selecciona_modo_busqueda(modo_busqueda, self.inicio, self.salida, self.grid)
         self.personaje.camino_busqueda(self.inicio,self.salida, self.grid)
 
-        print("Arbol")
-        print(self.personaje.arbol_movimientos)
-        print("Movimientos")
-        print(self.personaje.movimientos)
-
+        """         print("Arbol")
+            print(self.personaje.arbol_movimientos)
+            print("Movimientos")
+            print(self.personaje.movimientos)
+        """
 
 
         #Se establecen las variables booleanas para saber si el bomberman se puede mover o no
@@ -74,7 +80,7 @@ class GameModel(Model):
         print("Inicio: ", self.inicio)
         print("Salida: ", self.salida)
 
-        """ self.imprime_mundo_en_matriz() """
+        self.imprime_mundo_en_matriz()
        
 
         # Añadir globos (enemigos) en posiciones aleatorias
@@ -219,10 +225,72 @@ class GameModel(Model):
                 raise FileNotFoundError(f"El archivo '{ruta_relativa}' no se encontró en el proyecto.")
             
             with open(ruta_absoluta, 'r') as f:
-                posiciones_camino = []
-                # Lee el archivo y guarda cada línea en una lista
+                #Lee el archivo de texto, separando por comas y segun los caracteres, se coloca un agente en la grilla
+                #C es un camino
+                #C_b es la posicion de bomberman
+                #R es una roca
+                #M es un metal
+                #E es la salida
+                #C_g es un globo
+                #R_s es una salida con una roca
+                x=0
+                y=self.height-1
+
+                 # Lee el archivo línea por línea
+                for linea in f:
+                    # Elimina los espacios en blanco al principio y al final de la línea
+                    linea = linea.strip()
+                    # Divide la línea en caracteres separados por comas
+                    caracteres = linea.split(",")
+                    x=0
+                    
+                    # Imprime cada caracter uno por uno
+                    for caracter in caracteres:
+                        if caracter == 'R':
+                            roca = Roca(self.next_id(), self)
+                            self.grid.place_agent(roca, (x, y))
+                        elif caracter == 'C':
+                            camino = Camino(self.next_id(), self)
+                            self.grid.place_agent(camino, (x, y))
+                        elif caracter == 'M':
+                            metal = Metal(self.next_id(), self)
+                            self.grid.place_agent(metal, (x, y))
+                        elif caracter == 'E':
+                            salida = Salida(self.next_id(), self)
+                            self.grid.place_agent(salida, (x, y))
+                            self.salida = (x, y)
+                        elif caracter == 'C_b':
+                            self.inicio = (x, y)
+                            print('Se asigno bomberman en:', self.inicio)
+                        elif caracter == 'C_g':
+                            globo = GloboAgent(self.next_id(), self)
+                            self.grid.place_agent(globo, (x, y))
+                            self.schedule.add(globo)
+                            self.globos.append(globo)
+                            print('Se asigno globo en:', (x, y))
+                        elif caracter == 'R_s':
+                            salida = Salida(self.next_id(), self)
+                            self.grid.place_agent(salida, (x, y))
+                            self.salida = (x, y)
+                            roca = Roca(self.next_id(), self)
+                            self.grid.place_agent(roca, (x, y))
+                            print('Se asigno una salida en:', (x, y))
+                        else:
+                            metal = Metal(self.next_id(), self)
+                            self.grid.place_agent(metal, (x, y))
+
+                        x=x+1
+
+                    y=y-1
+
+
+                        
+                    
+                    # Imprime una "X" para indicar el fin de la línea
+                """                 posiciones_camino = []
                 for y, line in enumerate(f):
-                    for x, char in enumerate(line.strip()):
+
+                    for x, char in enumerate(line.strip().split(',')):
                         print(f"({x}, {y}): {char}")
 
                         if char == 'R':
@@ -239,15 +307,31 @@ class GameModel(Model):
                             salida = Salida(self.next_id(), self)
                             self.grid.place_agent(salida, (x, y))
                             self.salida = (x, y)
-                        elif char == 'P':
+                        elif char == 'C_b':
                             self.inicio = (x, y)
+                        elif char == 'C_g':
+                            globo = GloboAgent(self.next_id(), self)
+                            self.grid.place_agent(globo, (x, y))
+                            self.schedule.add(globo)
+                            self.globos.append(globo)
+                        elif char == 'R_s':
+                            salida = Salida(self.next_id(), self)
+                            self.grid.place_agent(salida, (x, y))
+                            self.salida = (x, y)
+                            roca = Roca(self.next_id(), self)
+                            self.grid.place_agent(roca, (x, y))
                         else:
-                            raise MapaError(f"Carácter no válido en la posición ({x}, {y}): '{char}'")
-                        
+                                raise MapaError(f"Carácter no válido en la posición ({x}, {y}): '{char}'") """
 
 
-                self.caminos = posiciones_camino
                 
+
+
+                            
+
+                """self.inicio = random.choice(posiciones_camino)
+                self.caminos = posiciones_camino
+                 """
 
             
 
@@ -302,22 +386,22 @@ class GameModel(Model):
                 if cell:
                     if type(cell[0]) is Salida:
                         if type(cell[1]) is Roca:
-                            print('✵', end="")
+                            print('R_s', end=",")
                         else:
-                            print('E', end="")
+                            print('E', end=",")
                         
                     elif type(cell[0]) is BombermanAgent:
-                        print('✵', end="")
+                        print('C_b', end=",")
                     elif type(cell[0]) is Roca:
-                        print('X', end="")
+                        print('R', end=",")
                     elif type(cell[0]) is Camino:
-                        print('◇', end="")
+                        print('C', end=",")
                     elif type(cell[0]) is Metal:
-                        print('◆', end="")
+                        print('M', end=",")
 
                     
                 else:
-                    print("X", end="")
+                    print("X", end=",")
             print()
 
         print('fin')
@@ -350,7 +434,6 @@ class GameModel(Model):
                 if contador > self.contador_niveles:
                     break
 
-            print(diccionario)
             return diccionario
 
         else:

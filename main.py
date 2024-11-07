@@ -12,8 +12,8 @@ from BombermanAgent import BombermanAgent, Bomba
 from GloboAgent import GloboAgent
 from GameModel import Roca, Camino, Metal, Salida
 
-WIDTH = 10
-HEIGHT = 10
+WIDTH = 20
+HEIGHT = 20
 
 simulation_parameters = {
     "modo_busqueda": mesa.visualization.Slider(name="0-Anch 1-Prof 2-Unifor 3-Beam Search 4-Hill Climbing 5-A*", value=0,min_value=0, max_value=5, step=1, description="Modo de busqueda"),
@@ -21,7 +21,7 @@ simulation_parameters = {
 "width": WIDTH,
 "height": HEIGHT,
 "num_globos": 0,
-"numero_rocas": mesa.visualization.Slider(name="Probabilidad de roca", value=10, min_value=1, max_value=200, step=1, description="Probabilidad de rocas en modo aleatorio"),
+"numero_rocas": mesa.visualization.Slider(name="Probabilidad de roca", value=5, min_value=1, max_value=200, step=1, description="Probabilidad de rocas en modo aleatorio"),
 "visualizar_camino": mesa.visualization.Checkbox(name="Visualizar camino", value=False, description="Visualizar camino de busqueda"),                     
     
 }
