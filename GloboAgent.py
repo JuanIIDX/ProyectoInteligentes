@@ -13,4 +13,21 @@ class GloboAgent(Agent):
         super().__init__(unique_id, model)
 
     def step(self):
-        print("Globo step")
+        # Obtener movimientos posibles solo en celdas de tipo Camino
+        possible_moves = self.get_possible_moves()
+        if possible_moves:
+            new_position = random.choice(possible_moves)
+            self.model.grid.move_agent(self, new_position)
+
+    def get_possible_moves(self):
+        """Obtener las celdas adyacentes que son caminos para moverse"""
+        neighbors = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
+        possible_moves = []
+
+        # Filtrar solo las celdas de camino
+        for pos in neighbors:
+            cell_contents = self.model.grid.get_cell_list_contents(pos)
+            if all(isinstance(agent, Camino) for agent in cell_contents) or not cell_contents:
+                possible_moves.append(pos)
+
+        return possible_moves

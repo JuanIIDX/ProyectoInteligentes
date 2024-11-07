@@ -12,8 +12,8 @@ from BombermanAgent import BombermanAgent, Bomba
 from GloboAgent import GloboAgent
 from GameModel import Roca, Camino, Metal, Salida
 
-WIDTH = 30
-HEIGHT = 30
+WIDTH = 15
+HEIGHT = 15
 
 simulation_parameters = {
     "modo_busqueda": mesa.visualization.Slider(name="0-Anch 1-Prof 2-Unifor 3-Beam Search 4-Hill Climbing 5-A*", value=0,min_value=0, max_value=5, step=1, description="Modo de busqueda"),

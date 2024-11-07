@@ -172,9 +172,10 @@ class GameModel(Model):
 
             for i in range(3):
                 globo = GloboAgent(self.next_id(), self)
-                globo_pos = (4,5)
+                globo_pos = random.choice(posiciones_camino)
                 self.grid.place_agent(globo, globo_pos)
                 self.schedule.add(globo)
+                posiciones_camino.remove(globo_pos)
 
 
 
