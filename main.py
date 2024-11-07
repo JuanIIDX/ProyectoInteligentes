@@ -12,8 +12,8 @@ from BombermanAgent import BombermanAgent, Bomba
 from GloboAgent import GloboAgent
 from GameModel import Roca, Camino, Metal, Salida
 
-WIDTH = 15
-HEIGHT = 15
+WIDTH = 10
+HEIGHT = 10
 
 simulation_parameters = {
     "modo_busqueda": mesa.visualization.Slider(name="0-Anch 1-Prof 2-Unifor 3-Beam Search 4-Hill Climbing 5-A*", value=0,min_value=0, max_value=5, step=1, description="Modo de busqueda"),
@@ -34,21 +34,18 @@ def dibuja_bomberman(agent):
 
     direction=agent.model.personaje.direction
 
-    if direction == 2:
-        return {"Shape": "images/S.png",  "Layer": 0, "w": 1, "h": 1}
-    elif direction == 4:
-        return {"Shape": "images/W.png",  "Layer": 0, "w": 1, "h": 1}
-    elif direction == 6:
-        return {"Shape": "images/E.png",  "Layer": 0, "w": 1, "h": 1}
-    elif direction == 8:
-        return {"Shape": "images/N.png",  "Layer": 0, "w": 1, "h": 1}
-    elif direction == 5:
-        #Se obtiene el numero del step en el modelo y se imprime
-
-        #El numero del step actual es
-        
+    if agent.model.personaje.victoria is False:
+        if direction == 2:
+            return {"Shape": "images/S.png",  "Layer": 0, "w": 1, "h": 1}
+        elif direction == 4:
+            return {"Shape": "images/W.png",  "Layer": 0, "w": 1, "h": 1}
+        elif direction == 6:
+            return {"Shape": "images/E.png",  "Layer": 0, "w": 1, "h": 1}
+        elif direction == 8:
+            return {"Shape": "images/N.png",  "Layer": 0, "w": 1, "h": 1}
 
 
+    if agent.model.personaje.victoria is True:
         animacion=agent.model.schedule.steps%2
         if animacion==0:
             return {"Shape": "images/V_B.png",  "Layer": 0, "w": 1, "h": 1}
@@ -82,7 +79,13 @@ def bomberman_visualization(agent):
 
 #Cambiar luego
 def dibujo_camino(agent):
-    if agent.model.personaje.can_mov == False:
+    if agent.model.game_over is True:
+        return {"Shape": "rect", "Filled": "true", "Color": "Red", "Layer": 0, "w": 1, "h": 1 }
+
+
+
+
+    if agent.model.personaje.can_mov == False and (agent.model.victoria is False and agent.model.game_over is False):
 
         if agent.model.personaje.bomba_activa:
             if agent.pos == agent.model.personaje.bomba.pos:

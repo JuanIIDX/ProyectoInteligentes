@@ -11,16 +11,24 @@ from clases import Camino
 class GloboAgent(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.can_move = False
 
     def step(self):
-        # Obtener movimientos posibles solo en celdas de tipo Camino
-        possible_moves = self.get_possible_moves()
-        if possible_moves:
-            new_position = random.choice(possible_moves)
-            self.model.grid.move_agent(self, new_position)
+        if self.can_move is False:
+            return
+        # Verificar si la posición actual está definida
+        if self.pos is not None:
+            # Obtener movimientos posibles solo en celdas de tipo Camino
+            possible_moves = self.get_possible_moves()
+            if possible_moves:
+                new_position = random.choice(possible_moves)
+                self.model.grid.move_agent(self, new_position)
 
     def get_possible_moves(self):
         """Obtener las celdas adyacentes que son caminos para moverse"""
+        if self.pos is None:
+            return []
+
         neighbors = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
         possible_moves = []
 

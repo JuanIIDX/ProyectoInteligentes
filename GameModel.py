@@ -29,16 +29,20 @@ class GameModel(Model):
         self.tipo_busqueda = 'X'
         self.numero_rocas = numero_rocas
 
+        self.game_over = False
+        self.victoria = False
 
 
 
 
 
+        self.globos=[]
         #Se crea el mundo
         self.crea_mundo(modo_aleatorio)
 
         # Se crea el agente Bomberman con la posicion de inicio
         self.personaje = BombermanAgent(1, self)
+        
         self.grid.place_agent(self.personaje, self.inicio)
         self.schedule.add(self.personaje)
 
@@ -57,6 +61,9 @@ class GameModel(Model):
         self.muestra_camino = False
         self.nivel_maximo = 0
         self.state = "Estado Inicial"
+
+
+
 
         
 
@@ -79,6 +86,9 @@ class GameModel(Model):
         if visualizar_camino is False:
             self.personaje.can_mov = True 
             self.contador_niveles = sum(len(vector) for vector in self.personaje.arbol_movimientos.values())
+
+            for globo in self.globos:
+                globo.can_move = True
 
 
 
@@ -176,6 +186,7 @@ class GameModel(Model):
                 self.grid.place_agent(globo, globo_pos)
                 self.schedule.add(globo)
                 posiciones_camino.remove(globo_pos)
+                self.globos.append(globo)
 
 
 
@@ -357,14 +368,48 @@ class GameModel(Model):
     def step(self):
         self.schedule.step()
 
+        if self.revisa_colisiones():
+            return
+        
+        if self.personaje.victoria:
+            self.gano()
+            return
+
         self.contador_niveles += 1
         if self.personaje.arbol_movimientos and self.contador_niveles >= sum(len(vector) for vector in self.personaje.arbol_movimientos.values()):
             self.personaje.can_mov = True
+            for globo in self.globos:
+                globo.can_move = True
+
+
         
-        #if not self.personaje.can_mov:
-        #    print(self.get_camino_busqueda())
-        #else:
-        #    print(self.personaje.movimientos)
+
+
+    def revisa_colisiones(self):
+        #Revisa si hay alguna colision entre bomberman y un globo, si la hay se dicta gameover
+        for agent in self.grid.get_cell_list_contents(self.personaje.pos):
+            if isinstance(agent, GloboAgent):
+                self.game_over_me()
+                
+                return True
+        return False
+    
+    def game_over_me(self):
+        self.game_over = True
+        for globo in self.globos:
+            globo.can_move = False 
+        self.personaje.can_mov = False
+        print("Perdio")
+
+    def gano(self):
+        self.victoria = True
+        for globo in self.globos:
+            globo.can_move = False 
+        self.personaje.can_mov = False
+        print("Gano")
+
+
+
 
 
 
